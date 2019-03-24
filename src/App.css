@@ -19,6 +19,16 @@
   color: white;
 }
 
+.Dino-container {
+  width: 24px;
+  overflow: hidden;
+}
+
+.Dino-sprite {
+  transform: scale(1);
+  transform-origin: top left;
+}
+
 .App-link {
   color: #61dafb;
 }
