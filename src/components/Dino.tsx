@@ -1,20 +1,34 @@
-import React, { useEffect, useState } from 'react';
-import tard from '../images/tard.png';
-import { move, setSpriteFrame } from './utils/movement';
+import React, { useEffect, useState, Dispatch, SetStateAction } from 'react';
+import { move, setSpriteFrame, nextFrame } from './utils/movement';
 import {
   JUMP_FRAMES,
   WALK_FRAMES,
   SPRITE_SIZE_MULTIPLIER,
   SPEED,
 } from './utils/constants';
+import styled from 'styled-components';
+import { DinoSprite, Direction } from '../types/dino';
 
-export default function Dino({ name }: { name: string }) {
+const SpriteContainer = styled.div`
+  /* ... */
+`;
+
+const Sprite = styled.img`
+  /* ... */
+`;
+
+export default function Dino({
+  name,
+  imageSourceLeft,
+  imageSourceRight,
+}: DinoSprite) {
   const [currentFrame, setFrame] = useState(0);
   const [containerPos, setContainerPos] = useState(0);
   const [idleTime, setIdleTime] = useState(0);
   const [jumpAnimation, setJumpAnimation] = useState({
     isRunning: false,
   });
+  const [direction, setDirection] = useState<Direction>('right');
 
   const [keyMap, setKeyMap] = useState({
     ArrowUp: false,
@@ -30,8 +44,8 @@ export default function Dino({ name }: { name: string }) {
     if (timeoutId !== null) clearTimeout(timeoutId);
 
     return window.setTimeout(() => {
-      setSpriteFrame(spriteElement, SPRITE_SIZE_MULTIPLIER, JUMP_FRAMES.end);
-      setFrame(JUMP_FRAMES.end);
+      // setSpriteFrame(spriteElement, JUMP_FRAMES.end, direction);
+      // setFrame(JUMP_FRAMES.end);
     }, 500);
   };
 
@@ -46,28 +60,32 @@ export default function Dino({ name }: { name: string }) {
     setKeyMap({ ...keyMap, [key]: true });
 
     if (key === 'ArrowRight') {
-      setFrame(currentFrame >= WALK_FRAMES.end ? 0 : currentFrame + 1);
+      setDirection('right');
+      setFrame(nextFrame(currentFrame, direction));
       setContainerPos(containerPos + SPEED);
       move(
         spriteElement,
         spriteContainer,
         containerPos,
         SPRITE_SIZE_MULTIPLIER,
-        currentFrame
+        currentFrame,
+        direction
       );
     } else if (key === 'ArrowLeft') {
-      setFrame(currentFrame === 0 ? WALK_FRAMES.end : currentFrame - 1);
+      setDirection('left');
+      setFrame(nextFrame(currentFrame, direction));
       setContainerPos(containerPos - SPEED);
       move(
         spriteElement,
         spriteContainer,
         containerPos,
         SPRITE_SIZE_MULTIPLIER,
-        currentFrame
+        currentFrame,
+        direction
       );
     } else if (key === 'ArrowUp') {
       const { start } = JUMP_FRAMES;
-      setSpriteFrame(spriteElement, SPRITE_SIZE_MULTIPLIER, start);
+      setSpriteFrame(spriteElement, start, direction);
       setFrame(start);
 
       if (!jumpAnimation.isRunning) {
@@ -83,7 +101,6 @@ export default function Dino({ name }: { name: string }) {
 
   useEffect(
     (): any => {
-      // @ts-ignore
       document.addEventListener('keydown', handleKeyDown);
       document.addEventListener('keyup', handleKeyUp);
 
@@ -95,8 +112,12 @@ export default function Dino({ name }: { name: string }) {
   );
 
   return (
-    <div className={`Dino-container ${name}`}>
-      <img src={tard} alt="dino" className={`Dino-sprite`} />
-    </div>
+    <SpriteContainer className={`Dino-container ${name}`}>
+      <Sprite
+        src={direction === 'right' ? imageSourceRight : imageSourceLeft}
+        alt="dino"
+        className={`Dino-sprite`}
+      />
+    </SpriteContainer>
   );
 }
