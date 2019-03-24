@@ -1,9 +1,10 @@
 export function setSpriteFrame(
-  sprite: HTMLElement,
+  sprite: HTMLElement | null,
   spriteSize: number,
   currentFrame: number
 ) {
-  sprite.style.transform = `translate(${spriteSize * currentFrame}px)`;
+  if (sprite !== null)
+    sprite.style.transform = `translate(${spriteSize * currentFrame}px)`;
 }
 
 export function move(
