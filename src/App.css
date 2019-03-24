@@ -20,17 +20,40 @@
 }
 
 .Dino-container {
-  width: 24px;
+  width: 36px;
+  top: 100px;
+  position: absolute;
   overflow: hidden;
 }
 
 .Dino-sprite {
-  transform: scale(1);
+  height: 36px;
   transform-origin: top left;
 }
 
 .App-link {
   color: #61dafb;
+}
+
+.Dino-container-jump {
+  animation-name: jump-container;
+  animation-duration: 1s;
+}
+
+.Dino-sprite-jump {
+  transform: translate(-264px) !important;
+}
+
+@keyframes jump-container {
+  0% {
+    top: 100px;
+  }
+  50% {
+    top: 50px;
+  }
+  100% {
+    top: 100px;
+  }
 }
 
 @keyframes App-logo-spin {
