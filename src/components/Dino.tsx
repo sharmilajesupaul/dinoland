@@ -6,12 +6,14 @@ import { DinoSprite, Direction } from '../types/dino';
 
 const SpriteContainer: AnyStyledComponent = styled.div`
   /* ... */
-  left: ${(props: any) => props.containerPos}px;
+  left: ${(props: { containerPos: number }) => props.containerPos}px;
 `;
 
 const Sprite: AnyStyledComponent = styled.img`
   /* ... */
-  transform: translate(${(props: any) => `${props.framePos}px`});
+  transform: translate(
+    ${(props: { framePos: number }) => `${props.framePos}px`}
+  );
 `;
 
 export default function Dino({
@@ -51,7 +53,6 @@ export default function Dino({
   };
 
   const handleKeyDown = ({ key }: KeyboardEvent) => {
-    const spriteElement: any = document.querySelector('.Dino-sprite');
     const spriteContainer: any = document.querySelector('.Dino-container');
     setKeyMap({ ...keyMap, [key]: true });
 
@@ -72,6 +73,7 @@ export default function Dino({
 
       if (!jumpAnimation.isRunning) {
         setJumpAnimation({ isRunning: true });
+        // TODO: Handle this better
         spriteContainer.classList.add('Dino-container-jump');
         window.setTimeout(() => {
           spriteContainer.classList.remove('Dino-container-jump');
@@ -94,7 +96,6 @@ export default function Dino({
   );
 
   return (
-    // @ts-ignore
     <SpriteContainer
       className={`Dino-container ${name}`}
       containerPos={containerPos}
