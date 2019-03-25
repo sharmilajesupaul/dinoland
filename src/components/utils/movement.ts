@@ -6,54 +6,30 @@ function nextFrameIncrement(direction: Direction) {
   return start > end ? -1 : 1;
 }
 
-function getFramePx(direction: Direction, currentFrame: number) {
-  // const spriteWidth = MAX_FRAMES * SPRITE_SIZE_MULTIPLIER;
+export function getFramePx(direction: Direction, currentFrame: number) {
   const moveBy = SPRITE_SIZE_MULTIPLIER * currentFrame;
 
-  if (currentFrame >= MAX_FRAMES) {
+  if (currentFrame > MAX_FRAMES) {
     return WALK_FRAMES[direction].start;
   }
 
   return -Math.abs(moveBy);
 }
 
-export function setSpriteFrame(
-  sprite: HTMLElement | null,
-  currentFrame: number,
-  direction: Direction
+export function nextFrame(
+  currentFrame: number = 1,
+  direction: Direction,
+  changeDirection: boolean
 ) {
-  if (sprite !== null) {
-    sprite.style.transform = '';
-    sprite.style.transform = `translate(${getFramePx(
-      direction,
-      currentFrame
-    )}px)`;
-  }
-}
-
-export function move(
-  sprite: HTMLElement,
-  container: HTMLElement,
-  containerPos: number,
-  spriteSize: number,
-  currentFrame: number,
-  direction: Direction
-) {
-  setSpriteFrame(sprite, currentFrame, direction);
-  container.style.left = `${containerPos}px`;
-}
-
-export function nextFrame(currentFrame: number = 1, direction: Direction) {
   const { start, end } = WALK_FRAMES[direction];
-  const walkDirection = nextFrameIncrement(direction);
-
-  if (direction === 'right') {
-    return currentFrame > end || currentFrame < start
-      ? start
-      : currentFrame + walkDirection;
-  } else {
-    return currentFrame < end || currentFrame > start
-      ? end
-      : currentFrame + walkDirection;
+  if (changeDirection) {
+    return start;
   }
+  const walkDirection = nextFrameIncrement(direction);
+  const outOfFrameRange =
+    walkDirection > 0
+      ? currentFrame > end || currentFrame < start
+      : currentFrame < end || currentFrame > start;
+
+  return outOfFrameRange ? start : currentFrame + walkDirection;
 }

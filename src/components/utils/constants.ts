@@ -22,7 +22,7 @@ export const WALK_FRAMES: WalkAnimationFrame = {
     end: 8,
   },
   left: {
-    start: 24,
+    start: 23,
     end: 16,
   },
 };
