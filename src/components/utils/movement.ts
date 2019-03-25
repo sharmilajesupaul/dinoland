@@ -1,4 +1,4 @@
-import { WALK_FRAMES, MAX_FRAMES, SPRITE_SIZE_MULTIPLIER } from './constants';
+import { WALK_FRAMES, MAX_FRAMES, JUMP_DISTANCE, SPRITE_SIZE_MULTIPLIER } from './constants';
 import { Direction } from '../../types/dino';
 
 function nextFrameIncrement(direction: Direction) {
@@ -32,4 +32,27 @@ export function nextFrame(
       : currentFrame < end || currentFrame > start;
 
   return outOfFrameRange ? start : currentFrame + walkDirection;
+}
+
+function calculateLeftPosition(xPos: number, direction: Direction, step: number) {
+  return xPos + JUMP_DISTANCE * step * nextFrameIncrement(direction);
+}
+
+export function jumpKeyframes(xPos: number, direction: Direction) {
+  const left50 = calculateLeftPosition(xPos, direction, 0.5);
+  const left100 = calculateLeftPosition(xPos, direction, 1);
+  return `
+    @keyframes jump-with-direction {
+    0% {
+      top: 100px;
+    }
+    50% {
+      left: ${left50};
+      top: 50px;
+    }
+    100% {
+      left: ${left100};
+      top: 100px;
+    }
+  `
 }

@@ -26,3 +26,4 @@ export const WALK_FRAMES: WalkAnimationFrame = {
     end: 16,
   },
 };
+export const JUMP_DISTANCE: number = 50;

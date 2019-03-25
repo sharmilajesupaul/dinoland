@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { nextFrame, getFramePx } from './utils/movement';
+import { nextFrame, getFramePx, jumpKeyframes } from './utils/movement';
+import injectStylesheet from './utils/injectStylesheet';
 import { JUMP_FRAMES, SPEED } from './utils/constants';
 import styled, { AnyStyledComponent } from 'styled-components';
 import { DinoSprite, Direction } from '../types/dino';
@@ -7,6 +8,10 @@ import { DinoSprite, Direction } from '../types/dino';
 const SpriteContainer: AnyStyledComponent = styled.div`
   /* ... */
   left: ${(props: { containerPos: number }) => props.containerPos}px;
+  ${({ setJump, animationName}: any) => setJump ? `
+    animation-name: ${animationName};
+    animation-duration: 1s;
+  ` : ''};
 `;
 
 const Sprite: AnyStyledComponent = styled.img`
@@ -23,9 +28,8 @@ export default function Dino({
 }: DinoSprite) {
   const [containerPos, setContainerPos] = useState(0);
   const [idleTime, setIdleTime] = useState(0);
-  const [jumpAnimation, setJumpAnimation] = useState({
-    isRunning: false,
-  });
+  const [isJumping, setIsJumping] = useState(false);
+  const [animationName, setAnimationName] = useState('jump-with-direction');
   const [direction, setDirection] = useState<Direction>('right');
   const [currentFrame, setFrame] = useState(1);
   const [framePos, setFramePos] = useState(getFramePx(direction, currentFrame));
@@ -34,6 +38,7 @@ export default function Dino({
     ArrowLeft: false,
     ArrowRight: false,
     ArrowDown: false,
+    Space: false,
   });
 
   const reset = (
@@ -47,18 +52,19 @@ export default function Dino({
     }, 500);
   };
 
-  const handleKeyUp = ({ key }: KeyboardEvent) => {
-    setKeyMap({ ...keyMap, [key]: false });
+  const handleKeyUp = ({ code }: KeyboardEvent) => {
+    setKeyMap({ ...keyMap, [code]: false });
     setIdleTime(reset(document.querySelector('.Dino-sprite'), idleTime));
   };
 
-  const handleKeyDown = ({ key }: KeyboardEvent) => {
+  const handleKeyDown = ({ code }: KeyboardEvent) => {
     const spriteContainer: any = document.querySelector('.Dino-container');
-    setKeyMap({ ...keyMap, [key]: true });
+    setKeyMap({ ...keyMap, [code]: true });
 
-    const newDirectionX = key === 'ArrowLeft' ? 'left' : 'right';
+    const newDirectionX = code === 'ArrowLeft' ? 'left' : 'right';
 
-    if (key === 'ArrowRight' || key === 'ArrowLeft') {
+    if (code === 'ArrowRight' || code === 'ArrowLeft') {
+      if (isJumping) return;
       const changeDirection = direction !== newDirectionX;
       const newFrame = nextFrame(currentFrame, newDirectionX, changeDirection);
       setDirection(newDirectionX);
@@ -67,17 +73,21 @@ export default function Dino({
         newDirectionX === 'left' ? containerPos - SPEED : containerPos + SPEED
       );
       setFramePos(() => getFramePx(direction, newFrame));
-    } else if (key === 'ArrowUp') {
+    } else if (code === 'ArrowUp' || code === 'Space') {
       const { start } = JUMP_FRAMES;
       setFrame(start);
 
-      if (!jumpAnimation.isRunning) {
-        setJumpAnimation({ isRunning: true });
+      if (!isJumping) {
+        setIsJumping(true);
+        if (keyMap.ArrowLeft || keyMap.ArrowRight) {
+          const keyframe = jumpKeyframes(containerPos, direction);
+          injectStylesheet(keyframe);
+        }
         // TODO: Handle this better
         spriteContainer.classList.add('Dino-container-jump');
         window.setTimeout(() => {
           spriteContainer.classList.remove('Dino-container-jump');
-          setJumpAnimation({ isRunning: false });
+          setIsJumping(false);
         }, 1000);
       }
     }
@@ -99,6 +109,8 @@ export default function Dino({
     <SpriteContainer
       className={`Dino-container ${name}`}
       containerPos={containerPos}
+      setJump={isJumping}
+      animationName={animationName}
     >
       <Sprite
         src={direction === 'right' ? imageSourceRight : imageSourceLeft}
