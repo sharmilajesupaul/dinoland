@@ -13,8 +13,7 @@ function getFramePx(direction: Direction, currentFrame: number) {
   if (currentFrame >= MAX_FRAMES) {
     return WALK_FRAMES[direction].start;
   }
-  console.log({ currentFrame, direction });
-  console.log(currentFrame * SPRITE_SIZE_MULTIPLIER);
+
   return -Math.abs(moveBy);
 }
 
@@ -54,7 +53,7 @@ export function nextFrame(currentFrame: number = 1, direction: Direction) {
       : currentFrame + walkDirection;
   } else {
     return currentFrame < end || currentFrame > start
-      ? start
-      : currentFrame - walkDirection;
+      ? end
+      : currentFrame + walkDirection;
   }
 }

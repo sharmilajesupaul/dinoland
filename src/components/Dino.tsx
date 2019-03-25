@@ -61,7 +61,7 @@ export default function Dino({
 
     if (key === 'ArrowRight') {
       setDirection('right');
-      setFrame(nextFrame(currentFrame, direction));
+      setFrame(nextFrame(currentFrame, 'right'));
       setContainerPos(containerPos + SPEED);
       move(
         spriteElement,
@@ -73,7 +73,7 @@ export default function Dino({
       );
     } else if (key === 'ArrowLeft') {
       setDirection('left');
-      setFrame(nextFrame(currentFrame, direction));
+      setFrame(nextFrame(currentFrame, 'left'));
       setContainerPos(containerPos - SPEED);
       move(
         spriteElement,
